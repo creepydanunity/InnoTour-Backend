@@ -1,7 +1,7 @@
 [project]
-name = "innotour-backend-micro"
+name = "innotour-backend-auth"
 version = "0.1.0"
-description = "Microservices backend"
+description = "Microservices: Auth Service"
 authors = [
     {name = "Daniil Vasilev",email = "creepydanunity@gmail.com"}
 ]
@@ -12,7 +12,7 @@ dependencies = [
     "fastapi (>=0.115.12,<0.116.0)",
     "uvicorn[standard] (>=0.34.2,<0.35.0)",
     "sqlalchemy (>=2.0.41,<3.0.0)",
-    "alembic (>=1.15.2,<2.0.0)",
+    "alembic (>=1.16.0,<2.0.0)",
     "pydantic (>=2.11.4,<3.0.0)",
     "python-dotenv (>=1.1.0,<2.0.0)"
 ]
