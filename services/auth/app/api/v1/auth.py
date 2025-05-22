@@ -11,7 +11,8 @@ from app.services.security import verify_password, create_access_token, create_r
 import app.core.exceptions as api_exceptions
 from app.core.config import settings
 from app.schemas.error import ErrorResponse
-from app.api.dependencies import get_current_user
+from app.api.dependencies import get_current_user, require_role
+from app.models.user import RoleEnum
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
@@ -199,6 +200,29 @@ async def refresh(
 async def verify(user = Depends(get_current_user)) -> UserOut:
     """
     Verify that the request is authenticated and return the current user.
+
+    Args:
+        user: The authenticated user injected by the get_current_user dependency.
+
+    Returns:
+        The UserOut schema of the current user.
+    """
+    return user
+
+@router.get(
+    "/verify-admin",
+    dependencies=[Depends(require_role(RoleEnum.CENTER_ADMIN))],
+    response_model=UserOut,
+    status_code=status.HTTP_200_OK,
+    responses={
+        401: {"model": ErrorResponse, "description": "Not authenticated"},
+        403: {"model": ErrorResponse, "description": "Not enough permission"},
+        422: {"model": ErrorResponse, "description": "Validation Error"},
+    },
+)
+async def verify_admin(user = Depends(get_current_user)) -> UserOut:
+    """
+    Verify that the request is authenticated by user with admin role and return the current user.
 
     Args:
         user: The authenticated user injected by the get_current_user dependency.
