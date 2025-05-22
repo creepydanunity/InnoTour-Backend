@@ -3,6 +3,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Alembic migration scripts
+# ignore all .py files in any alembic/versions folder...
+services/*/alembic/versions/*.py
+# …but keep the __init__.py so the folder remains in Git
+!services/*/alembic/versions/__init__.py
+
 # C extensions
 *.so
 
