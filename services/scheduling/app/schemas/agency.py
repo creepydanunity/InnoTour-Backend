@@ -1,18 +1,22 @@
 from pydantic import BaseModel
 from app.models.agency import AgencyTypeEnum
 
-class AgencyCreate(BaseModel):
+class AgencyIn(BaseModel):
     name: str
     agency_type: AgencyTypeEnum
 
-class AgencyOut(BaseModel):
+class AgencyBase(BaseModel):
     id: int
-    name: str
 
+class AgencyOut(AgencyBase):
+    name: str
+    agency_type: AgencyTypeEnum
     class Config:
         orm_mode = True
 
-class AgencyUpdate(BaseModel):
-    id: int
+class AgencyUpdate(AgencyBase):
     name: str
     agency_type: AgencyTypeEnum
+
+class UserIn(BaseModel):
+    id: int

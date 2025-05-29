@@ -2,6 +2,7 @@ import enum
 from sqlalchemy import Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
+from app.models.booking import Booking
 
 
 class AgencyTypeEnum(str, enum.Enum):
@@ -13,6 +14,12 @@ class Agency(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     name: Mapped[str] = mapped_column(nullable=False)
     agency_type: Mapped[AgencyTypeEnum] = mapped_column(Enum(AgencyTypeEnum), default=AgencyTypeEnum.INNER, nullable=False)
+
+    bookings: Mapped[list["Booking"]] = relationship(
+        "Booking",
+        back_populates="agency",
+        cascade="all, delete-orphan"
+    )
 
     def __repr__(self) -> str:
         return f"<Agency id={self.id!r} name={self.name!r}>"

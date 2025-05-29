@@ -1,5 +1,5 @@
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, HTTPException, Security, status
+from fastapi.security import APIKeyHeader, HTTPBearer, HTTPAuthorizationCredentials
 from jwt import PyJWTError, decode as jwt_decode
 from app.core.config import settings
 from app.schemas.token import TokenPayload
@@ -31,3 +31,12 @@ def require_role(role: RoleEnum):
             raise PermissionRequired()
         return payload
     return role_checker
+
+internal_api_key_header = APIKeyHeader(name="X-Internal-Token", auto_error=False)
+
+async def require_internal_api_key(
+    api_key: str = Security(internal_api_key_header),
+):
+    if api_key != settings.internal_secret:
+        raise PermissionRequired()
+    return api_key

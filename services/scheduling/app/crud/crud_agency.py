@@ -1,10 +1,18 @@
 from sqlalchemy import select
-from app.core.exceptions import AgencyNotFound
+from app.core.exceptions import AgencyAlreadyRegistered, AgencyNotFound
 from app.models.agency import Agency
-from app.schemas.agency import AgencyCreate, AgencyUpdate
+from app.schemas.agency import AgencyIn, AgencyUpdate
 from sqlalchemy.ext.asyncio import AsyncSession
 
-async def create_agency(db: AsyncSession, agency_data: AgencyCreate) -> Agency:
+async def create_agency(db: AsyncSession, agency_data: AgencyIn) -> Agency:
+    stmt = (
+        select(Agency)
+        .where(Agency.name == agency_data.name)
+    )
+    result = await db.execute(stmt)
+    if result.scalars().first():
+        raise AgencyAlreadyRegistered(agency_data.name)
+    
     agency = Agency(
         name=agency_data.name,
         agency_type=agency_data.agency_type
@@ -38,10 +46,9 @@ async def delete_agency(db: AsyncSession, id: int) -> None:
     await db.delete(agency)
     await db.commit()
 
-async def get_agency_by_name(db: AsyncSession, name: str) -> Agency | None:
-    stmt = (
-        select(Agency)
-        .where(Agency.name == name)
-    )
-    result = await db.execute(stmt)
-    return result.scalars().first()
+async def get_agency(db: AsyncSession, id: int) -> Agency | None:
+    agency = await db.get(Agency, id)
+    if not agency:
+        raise AgencyNotFound()
+    
+    return agency
